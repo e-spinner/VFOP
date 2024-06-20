@@ -8,7 +8,7 @@ global obj;
 %obj consists of [firstObjectiveValue, secondObjectiveValue, rank]
 
 %Example Complete ordering
-obj = [3.6 3.9 1;    2.5 4.1 2;   5.5 2.5 3;     0.5 5.2 4;    6.9 1.8 5];
+obj = [3.6 3.9 1;    2.5 4.1 2;   5.5 2.5 3;     0.5 5.2 4;    6.9 1.8 5;   1.2 2.8 6];
 
 %Example Partial ordering
 %obj = [3.6 3.9 1;    2.5 4.1 2;   5.5 2.5 3;     0.5 5.2 3;    6.9 1.8 4];
