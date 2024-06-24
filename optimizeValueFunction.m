@@ -1,20 +1,22 @@
+% original Value Function Optimization code altered to accept any number of
+% input points and transformed into a callable function for use with
+% matlab.engine by Elijah K Spinner
+
 function result = optimizeValueFunction(obj, show)
+
+% obj consists of [firstObjectiveValue, secondObjectiveValue, rank]
+% show controls if matlab plots the results or not
 
 %Code written by Ankur Sinha
 %Version: 18072011
 %Note: Give non-dominated points only
 %Positive epsilon value denotes that the value function correctly fitted the decision maker preferences.
-
-    global obj
        
     % IMK -- Plotting the individual points
     if show == true
         plot(obj(:,1),obj(:,2), '*r');
         hold on
     end
-    
-    % EKS -- Turning arrow into column vector insetad of row vector
-    arrow = repmat('P', size(obj, 1), 1);
     
     % EKS -- Replacing square indexing horzcat with mutable size indexing
     if show == true
@@ -29,9 +31,13 @@ function result = optimizeValueFunction(obj, show)
     %An interactive evolutionary multi-objective optimization method based on
     %progressively approximated value functions. IEEE Transactions on Evolutionary
     %Computation, 14(5):723739, 2010.
+
+    % EKS -- Set optimization options
+    options = optimoptions('fmincon', 'MaxFunctionEvaluations', 10000);
     
     % z - covers our 
-    [z,fval,exitflag,output,lambda] = fmincon(@fun,1.*ones(7,1),[],[],[],[],[0 0 0 0 -1000 -1000 -1000]',[1 1 1 1 1000 1000 1000]', @con);
+    % EKS -- passing pbj to @con
+    [z,fval,~,~,~] = fmincon(@fun,1.*ones(7,1),[],[],[],[],[0 0 0 0 -1000 -1000 -1000]',[1 1 1 1 1000 1000 1000]', @(x) con(x, obj), options);
     
     if fval>0
         disp('Information not correctly fitted');
@@ -43,14 +49,13 @@ function result = optimizeValueFunction(obj, show)
     
     % z = [          -4.688e-04];
     
-    OptimizationParameters = z %First six are value function parameters and the last one is epsilon
+    OptimizationParameters = z; %First six are value function parameters and the last one is epsilon
     
     for i=1:size(obj,1)
         u(i)= utilfunc(obj(i,:),z);
     end
     
     for i=1:size(obj,1)
-        fh_old = @(x,y) (z(1).*x + z(2).*y + z(5)).*(z(3).*y + z(4).*x + z(6)) - u(i);
         fh = @(x,y) (z(1).*x + z(5) + z(2).*y + z(5)).*(z(3).*y + z(6) + z(4).*x + z(6)) - u(i);
     
         if show == true
@@ -58,7 +63,7 @@ function result = optimizeValueFunction(obj, show)
         end
     end
     
-    Utilities = u
+    Utilities = u;
     
     if show == true
         title('');
@@ -74,8 +79,8 @@ function f=fun(x)
     f = -x(end);
 end
 % Modified version 
-function [c ceq]=con(x)
-    global obj;
+% EKS -- Removed global obj, passing obj to constraint calculations
+function [c, ceq]=con(x, obj)
 
     delta = 0.1;
     for i=1:size(obj,1)-1
@@ -110,11 +115,6 @@ end
 
 
 % IMK -- Note: Utility function is the same as a value function 
-function u=utilfunc_old(obj,x)
-    u = (x(1)*obj(1) + x(2)*obj(2) + x(5)) * (x(3)*obj(2) + x(4)*obj(1) + x(6));
-end
-
-
 % IMK -- I wrote this utility function based on eq 6 
 function u=utilfunc(obj,x)
     % x(1) k11
