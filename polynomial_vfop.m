@@ -2,7 +2,7 @@
 % input points and transformed into a callable function for use with
 % matlab.engine by Elijah K Spinner
 
-function result = optimizeValueFunction(obj, show)
+function result = polynomial_vfop(obj, show)
 
 % obj consists of [firstObjectiveValue, secondObjectiveValue, rank]
 % show controls if matlab plots the results or not
@@ -36,7 +36,7 @@ function result = optimizeValueFunction(obj, show)
     options = optimoptions('fmincon', 'MaxFunctionEvaluations', 10000);
     
     % z - covers our 
-    % EKS -- passing pbj to @con
+    % EKS -- passing obj to @con
     [z,fval,~,~,~] = fmincon(@fun,1.*ones(7,1),[],[],[],[],[0 0 0 0 -1000 -1000 -1000]',[1 1 1 1 1000 1000 1000]', @(x) con(x, obj), options);
     
     if fval>0

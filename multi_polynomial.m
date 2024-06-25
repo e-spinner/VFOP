@@ -1,3 +1,7 @@
+% original Value Function Optimization code altered to accept any number of
+% input points by Elijah K Spinner
+
+
 %Code written by Ankur Sinha
 %Version: 18072011
 %Note: Give non-dominated points only
